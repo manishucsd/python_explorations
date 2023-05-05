@@ -1,29 +1,31 @@
 import argparse
 from options import *
-from matmul import *
-from conv import *
+from matmul import add_matmul_args
+from conv import add_conv_args
 
 class OperationHelpAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values)
-
+        print(f"namespace: {namespace}")
+        print(f"option_string: {option_string}")
+        print(f"values: {values}")
         if option_string == "--help":
-            if values == "matmul":
+            if namespace.op_kind == "matmul":
                 matmul_parser.print_help()
-            elif values == "conv":
+            elif namespace.op_kind == "conv":
                 conv_parser.print_help()
             else:
                 parser.print_help()
             exit(0)
 
-parser = argparse.ArgumentParser(description="Profiling tool for matmul and convolution operations.")
+parser = argparse.ArgumentParser(add_help=False, description="Profiling tool for matmul and convolution operations.")
 add_common_arguments(parser)
 
-parser.add_argument("--op-kind", dest="op_kind", default='matmul', choices=["matmul", "conv"], action=OperationHelpAction, help="Operation kind: matmul or conv")
-#parser.add_argument("--help", dest="help", action=OperationHelpAction, help="Show help message and exit")
+parser.add_argument("--op-kind", dest="op_kind", default='all', choices=["all", "matmul", "conv"], help="Operation kind")
+parser.add_argument("--help", type=bool, action=OperationHelpAction, help="Show help message and exit")
 
 # Add operation-specific arguments with help messages
-matmul_parser = argparse.ArgumentParser(add_help=True, description="Matrix multiplication profiling options")
+matmul_parser = argparse.ArgumentParser(add_help=False, description="Matrix multiplication profiling options")
 add_matmul_args(matmul_parser)
 
 conv_parser = argparse.ArgumentParser(add_help=False, description="Convolution profiling options")
@@ -45,7 +47,8 @@ args = argparse.Namespace(**vars(args), **vars(operation_args))
 
 # Print the arguments
 print(args)
-
+print(args.__dict__)
+print(args._get_kwargs())
 # Process the arguments based on the selected operation
 if args.op_kind == "matmul":
     print(f"Profiling matmul with M: {args.m}, N: {args.n}, K: {args.k}")

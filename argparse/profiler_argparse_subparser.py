@@ -8,7 +8,7 @@ def main():
     # Create subparsers for each op_kind
     subparsers = parser.add_subparsers(dest="op_kind", help="Operation kind")
 
-    matmul_parser = subparsers.add_parser('all', help="All operations")
+    all_subparser = subparsers.add_parser('all', help="All operations")
 
     # Create a subparser for matmul
     matmul_parser = subparsers.add_parser('matmul', help="Matrix multiplication operation")
